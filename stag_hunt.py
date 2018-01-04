@@ -54,7 +54,7 @@ class Stag:
 
 
 # size of game board
-space_size = 3
+space_size = 10
 
 # animals in ecosystem and probability of seed
 ecosystem = {"r": 0.5, "s": 0.5, "f": 0.5}
@@ -77,7 +77,7 @@ def initialize():
                 elif species == 's':
                     row.append(Stag('s'+str(x)+str(y)))
                 elif species == 'f':
-                    row.append(Stag('f'+str(x)+str(y)))
+                    row.append(Fox('f'+str(x)+str(y)))
             else:
                 row.append(0)
         grid.append(row)
@@ -100,7 +100,7 @@ def update():
             stag_neighbors = 0
             rabbit_neighbors = 0
             for dx in [-1, 0, 1]:
-                for dy in [-1, 0, 1]:
+               for dy in [-1, 0, 1]:
                     current_species = grid[((x+dx) % space_size)][((y+dy) % space_size)]
                     if(dx, dy) != (0, 0) and type(current_species) != int:
                         if grid[((x+dx) % space_size)][((y+dy) % space_size)].label.find('f') > -1:
