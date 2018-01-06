@@ -44,23 +44,26 @@ class Game:
     # to update the game is to play a round
     def play(self):
 
-        for strategy in self.choices:
-            if self.agentA.strategy == self.agentB.strategy == 'defect':
-                self.agentA.score += self.inclusive_defect
-                self.agentB.score += self.inclusive_defect
+        if self.agentA.strategy == self.agentB.strategy == 'defect':
+            print self.agentA.label + " and " + self.agentB.label + " defected and scored " + str(self.inclusive_defect)
+            self.agentA.score += self.inclusive_defect
+            self.agentB.score += self.inclusive_defect
 
-            if self.agentA.strategy == self.agentB.strategy == 'cooperate':
-                self.agentA.score += self.inclusive_cooperate
-                self.agentB.score += self.inclusive_cooperate
+        if self.agentA.strategy == self.agentB.strategy == 'cooperate':
+            print self.agentA.label + " and " + self.agentB.label + " cooperated and scored " + str(self.inclusive_cooperate)
+            self.agentA.score += self.inclusive_cooperate
+            self.agentB.score += self.inclusive_cooperate
 
-            if self.agentA.strategy != self.agentB.strategy and self.agentA.strategy == 'cooperate':
-                self.agentA.score += self.exclusive_cooperate
-                self.agentB.score += self.exclusive_defect
+        if self.agentA.strategy != self.agentB.strategy and self.agentA.strategy == 'cooperate':
+            print self.agentA.label + " scored " + str(self.exclusive_cooperate) + " with " + self.agentA.strategy + " and " + self.agentB.label + " scored " + str(self.exclusive_defect) + " with " + self.agentB.strategy
+            self.agentA.score += self.exclusive_cooperate
+            self.agentB.score += self.exclusive_defect
 
-            if self.agentA.strategy != self.agentB.strategy and self.agentA.strategy == 'defect':
-                self.agentA.score += self.exclusive_defect
-                self.agentB.score += self.exclusive_cooperate
+        if self.agentA.strategy != self.agentB.strategy and self.agentA.strategy == 'defect':
+            print self.agentA.label + " scored " + str(self.exclusive_defect) + " with " + self.agentA.strategy + " and " + self.agentB.label + " scored " + str(self.exclusive_cooperate) + " with " + self.agentB.strategy
+            self.agentA.score += self.exclusive_defect
+            self.agentB.score += self.exclusive_cooperate
 
     def get_scores(self):
-        print "Agent " + self.agentA.label + " has " + str(self.agentA.score) + " points."
-        print "Agent " + self.agentB.label + " has " + str(self.agentB.score) + " points."
+        print self.agentA.label + " has " + str(self.agentA.score) + " points."
+        print self.agentB.label + " has " + str(self.agentB.score) + " points."
