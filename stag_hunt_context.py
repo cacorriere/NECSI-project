@@ -9,6 +9,7 @@ import pprint
 import random
 import Nash
 from matplotlib.colors import ListedColormap
+import networkx as nx
 
 # set up animial classes
 class Fox(Nash.Agent):
@@ -54,13 +55,15 @@ ecosystem = {"r": 0.5, "s": 0.5, "f": 0.5}
 
 
 def initialize():
-    global grid, color_grid, foxes, rabbits, stags
+    global grid, color_grid, foxes, rabbits, stags, nodes, graph, stag_nodes
+    graph = nx.Graph()
     grid = []
     foxes = []
     rabbits = []
     stags = []
+    stag_nodes =[]
     color_grid = zeros([space_size, space_size])
-
+    nodes = {}
     # seed gameboard
     for x in range(space_size):
         row = []
@@ -72,16 +75,21 @@ def initialize():
                 if species == 'r':
                     rabbit = Rabbit('r'+str(x)+str(y))
                     color_grid[x][y] = 1
+                    nodes['r'+str(x)+str(y)] = (x, y)
                     row.append(rabbit)
                     rabbits.append(rabbit)
                 elif species == 's':
                     stag = Stag('s'+str(x)+str(y))
                     color_grid[x][y] = 2
+                    nodes['s'+str(x)+str(y)] = (x, y)
+                    stag_nodes.append('s'+str(x)+str(y))
                     row.append(stag)
                     stags.append(stag)
+
                 elif species == 'f':
                     fox = Fox('f'+str(x)+str(y))
                     color_grid[x][y] = 3
+                    nodes['f'+str(x)+str(y)] = (x, y)
                     row.append(fox)
                     foxes.append(fox)
             else:
@@ -92,9 +100,17 @@ def initialize():
 
 
 def observe():
+
     row_labels = range(space_size)
     col_labels = range(space_size)
     cmap = ListedColormap(['white','pink', 'tan', 'red'])
+    # nx.draw_networkx_nodes(graph,nodes,
+    #                    nodelist=stag_nodes,
+    #                    node_color='tan',
+    #                    node_size=500,
+    #                alpha=0.8)
+    nx.draw(graph, with_labels = True, pos = nodes)
+    print graph.nodes
     plt.matshow(color_grid, cmap=cmap)
     plt.xticks(range(space_size), col_labels)
     plt.yticks(range(space_size), row_labels)
@@ -116,10 +132,13 @@ def update():
                     if(dx, dy) != (0, 0) and type(current_species) != int and type(grid[x][y]) == Fox:
                         if current_species.label.find('f') > -1:
                             grid[x][y].fox_neighbors.append(current_species)
+                            graph.add_edge(grid[x][y].label, current_species.label)
                         if current_species.label.find('r') > -1:
                             grid[x][y].rabbit_neighbors += 1
+                            graph.add_edge(grid[x][y].label, current_species.label)
                         if current_species.label.find('s') > -1:
                             grid[x][y].stag_neighbors += 1
+                            graph.add_edge(grid[x][y].label, current_species.label)
             #print str(x) + ", " + str(y) + " is " +str(grid[x][y]) + " with these neighbors: foxes: " + str(fox_neighbors) + " rabbits: "+ str(rabbit_neighbors) + " stags: "+ str(stag_neighbors)
             if type(grid[x][y]) == Fox and len(grid[x][y].fox_neighbors) > 0:
                 for foxB in grid[x][y].fox_neighbors:
