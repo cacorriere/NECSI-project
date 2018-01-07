@@ -14,18 +14,23 @@ import networkx as nx
 # set up animial classes
 class Fox(Nash.Agent):
 
-    def __init__(self, label):
-        Nash.Agent.__init__(self, label)
+    def __init__(self, x, y):
+        self.label = 'f'+str(x)+str(y)
+        Nash.Agent.__init__(self, self.label)
         self.fox_neighbors = []
         self.stag_neighbors = 0
         self.rabbit_neighbors = 0
+        self.color = 'red'
+
 
 
 class Rabbit(object):
 
-    def __init__(self, label):
+    def __init__(self, x, y):
         self.points = 1
-        self.label = str(label)
+        self.label = 'r'+str(x)+str(y)
+        self.color = 'white'
+        self.type = Rabbit
 
     def __str__(self):
         return self.label
@@ -36,9 +41,10 @@ class Rabbit(object):
 
 class Stag(object):
 
-    def __init__(self, label):
+    def __init__(self, x, y):
         self.points = 2
-        self.label = str(label)
+        self.label = 's'+str(x)+str(y)
+        self.color = 'tan'
 
     def __str__(self):
         return self.label
@@ -73,21 +79,20 @@ def initialize():
             # flip coin to see if species is seeded or cell is empty
             if ecosystem[species] > random.random():
                 if species == 'r':
-                    rabbit = Rabbit('r'+str(x)+str(y))
+                    rabbit = Rabbit(x,y)
                     color_grid[x][y] = 1
                     nodes['r'+str(x)+str(y)] = (x, y)
                     row.append(rabbit)
                     rabbits.append(rabbit)
                 elif species == 's':
-                    stag = Stag('s'+str(x)+str(y))
+                    stag = Stag(x,y)
                     color_grid[x][y] = 2
                     nodes['s'+str(x)+str(y)] = (x, y)
-                    stag_nodes.append('s'+str(x)+str(y))
                     row.append(stag)
                     stags.append(stag)
 
                 elif species == 'f':
-                    fox = Fox('f'+str(x)+str(y))
+                    fox = Fox(x, y)
                     color_grid[x][y] = 3
                     nodes['f'+str(x)+str(y)] = (x, y)
                     row.append(fox)
@@ -100,7 +105,9 @@ def initialize():
 
 
 def observe():
-
+    val_map = {'A': 'pink',
+               'D': 'red',
+               'H': 'tan'}
     row_labels = range(space_size)
     col_labels = range(space_size)
     cmap = ListedColormap(['white','pink', 'tan', 'red'])
@@ -144,28 +151,23 @@ def update():
                 for foxB in grid[x][y].fox_neighbors:
                     foxA = grid[x][y]
                     if (foxA, foxB) not in games_played:
-                        print "\n"+ str(grid[x][y]) + " has " + str(grid[x][y].fox_neighbors) + " foxes, " + str(grid[x][y].rabbit_neighbors) + " rabbits, & " + str(grid[x][y].stag_neighbors) + " stags as neighbors."
-                        print "Let's go hunting!"
                         g = Nash.Game(foxA, foxB)
                         if foxA.stag_neighbors > 0 and foxA.rabbit_neighbors > 0:
-                            print "can hunt rabbits or stags!"
                             g.inclusive_cooperate = 5
                             g.inclusive_defect = 3
                             g.exclusive_defect = 0
                             g.exclusive_cooperate = 3
                         elif foxA.stag_neighbors == 0 and foxA.rabbit_neighbors == 0:
-                            print "Nothing to hunt :(_"
+
                             continue
 
                         elif foxA.stag_neighbors > 0 and foxA.rabbit_neighbors == 0:
-                            print "we can hunt stags."
                             g.inclusive_cooperate = 5
                             g.inclusive_defect = 0
                             g.exclusive_defect = 0
                             g.exclusive_cooperate = 0
 
                         elif foxA.stag_neighbors == 0 and foxA.rabbit_neighbors > 0:
-                            print "we can hunt rabbits"
                             g.inclusive_cooperate = 0
                             g.inclusive_defect = 3
                             g.exclusive_defect = 0
@@ -176,9 +178,7 @@ def update():
                         foxB.games_played += 1
                         foxA.games_played += 1
                         g.get_scores()
-                        print "total stags:" + str(len(stags))
-                        print "total rabbits:" + str(len(rabbits))
-                        print games_played
+
 
 
     #         if current_state == 1:
@@ -192,9 +192,5 @@ def update():
 
 initialize()
 update()
-
-for fox in foxes:
-    if fox.games_played > 0:
-        print 'fox ' + fox.label + ' scored ' + str(fox.score) + ' in ' + str(fox.games_played) + ' games with ' + fox.strategy
 observe()
 #pycxsimulator.GUI(title='My Simulator', interval=0,parameterSetters=[]).start(func=[initialize, observe, update])
